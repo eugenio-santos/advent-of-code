@@ -19,12 +19,21 @@ defmodule D2 do
                 c |> String.split() |> List.first() |> String.to_integer()}
             end)
             |>Enum.reduce(%{}, fn m, a ->
-                Map.merge(m, a, fn _k, v1, v2 -> v1 + v2 end)
+                Map.merge(m, a)
             end )
         end)
         |>Enum.reduce(%{}, fn m, a ->
-            Map.merge(m, a, fn _k, v1, v2 -> v1 + v2 end)
+            Map.merge(m, a, fn _k, v1, v2 ->
+                if v1 >= v2 do
+                    v1
+                else
+                  v2
+                end
+            end)
         end )
+        |>Enum.reduce(1, fn {_, v}, acc ->
+            acc * v
+        end)
     end
 
     def s do
@@ -33,28 +42,16 @@ defmodule D2 do
             l = String.trim(line)
 
             [g | draws] = String.split(l, ":")
-            # IO.inspect(draws)
+            IO.inspect(line)
 
             gameid = D2.getGameId(g)
 
             m = List.first(draws)
             |> D2.parseDraw()
-            # |> IO.inspect()
 
-            cond do
-                Map.get(m, "red") > 12 -> {:noGame}
-                Map.get(m, "green") > 13 -> {:noGame}
-                Map.get(m, "blue") > 14 -> {:noGame}
-                true -> {:ok, gameid}
-            end
         end)
-        |> Enum.reduce(0, fn game, acc ->
-            # IO.inspect(game, label: "g")
-            IO.inspect(acc, label: "acc")
-            case game do
-                {:ok, v} -> acc + v
-                _ -> acc
-            end
+        |> Enum.reduce(fn pow, acc ->
+            acc + pow
         end)
     end
 end
