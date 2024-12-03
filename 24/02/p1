@@ -1,0 +1,73 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
+
+func main() {
+	file, err := os.Open("input")
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	// Create a scanner
+	scanner := bufio.NewScanner(file)
+
+	safe_lvls := 0
+	// Read the file line by line
+LineLoop:
+	for scanner.Scan() {
+		line := scanner.Text()
+		// fmt.Println(line)
+		Slvls := strings.Split(line, " ")
+
+		lvls := []int{}
+		for _, l := range Slvls {
+			il, _ := strconv.Atoi(l)
+			lvls = append(lvls, il)
+		}
+
+		prev := lvls[1]
+		prevDiff := lvls[0] - lvls[1]
+
+		// fmt.Println(prev, prevDiff)
+		if !(abs(prevDiff) >= 1 && abs(prevDiff) <= 3) {
+			continue
+		}
+
+		for _, lvl := range lvls[2:] {
+			diff := prev - lvl
+			// fmt.Println(prev, prevDiff, diff)
+
+			if diff*prevDiff < 0 {
+				continue LineLoop
+			}
+			if !(abs(diff) >= 1 && abs(diff) <= 3) {
+				continue LineLoop
+			}
+
+			prev = lvl
+			prevDiff = diff
+		}
+
+		// fmt.Println(line)
+		// fmt.Println("")
+
+		safe_lvls++
+	}
+
+	fmt.Println(safe_lvls)
+}
+
+func abs(i int) int {
+	if i >= 0 {
+		return i
+	}
+	return -i
+}
