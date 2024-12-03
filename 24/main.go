@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-
+	_ = d03p1("")
 }
 
 func lines() []string {

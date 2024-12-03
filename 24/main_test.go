@@ -5,6 +5,20 @@ import (
 	"testing"
 )
 
+func TestD01P1(t *testing.T) {
+	result := d01p1()
+	if result != 1938424 {
+		t.Error(result)
+	}
+}
+
+func TestD01P2(t *testing.T) {
+	result := d01p2()
+	if result != 22014209 {
+		t.Error(result)
+	}
+}
+
 func TestD03P1(t *testing.T) {
 	f, err := os.ReadFile("d03")
 	if err != nil {

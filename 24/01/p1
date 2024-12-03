@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("input")
+	file, err := os.Open("d01")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return
@@ -46,22 +46,4 @@ func main() {
 	}
 
 	println(sum)
-}
-
-func sortedInsert(v int, s []int) []int {
-	i, _ := sort.Find(len(s), func(i int) int {
-		return v - s[i]
-	})
-
-	return append(s[:i], append([]int{v}, s[i:]...)...)
-}
-
-func absDiff(x int, y int) int {
-	s := x - y
-
-	if s < 0 {
-		return -s
-	}
-
-	return s
 }
