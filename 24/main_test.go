@@ -19,6 +19,20 @@ func TestD01P2(t *testing.T) {
 	}
 }
 
+func TestD02P1(t *testing.T) {
+	result := d02p1()
+	if result != 510 {
+		t.Error(result)
+	}
+}
+
+func TestD02P2(t *testing.T) {
+	result := d02p2()
+	if result != 553 {
+		t.Error(result)
+	}
+}
+
 func TestD03P1(t *testing.T) {
 	f, err := os.ReadFile("d03")
 	if err != nil {
