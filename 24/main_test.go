@@ -68,13 +68,57 @@ func TestD03P2(t *testing.T) {
 		expected int
 	}{
 		{"example", "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))", 48},
-		{"example", string(f), 67269798},
+		{"p2", string(f), 67269798},
 	}
 
 	for _, tt := range tests {
 		result := d03p2(tt.input)
 		if tt.expected != result {
 			t.Error(tt.id, " - expected ", tt.expected, " got ", result)
+		}
+	}
+}
+
+func TestD04P1(t *testing.T) {
+	tests := []struct {
+		id       string
+		file     string
+		expected int
+	}{
+		{"example", "inputs/d04test", 18},
+		{"p1", "inputs/d04", 2567},
+	}
+	for _, tt := range tests {
+		lines := lines(tt.file)
+		m := [][]rune{}
+		for _, l := range lines {
+			m = append(m, []rune(l))
+		}
+
+		if result := d04p1(m); result != tt.expected {
+			t.Error("expected", tt.expected, "result", result)
+		}
+	}
+}
+
+func TestD04P2(t *testing.T) {
+	tests := []struct {
+		id       string
+		file     string
+		expected int
+	}{
+		{"example", "inputs/d04test", 9},
+		{"p1", "inputs/d04", 2029},
+	}
+	for _, tt := range tests {
+		lines := lines(tt.file)
+		m := [][]rune{}
+		for _, l := range lines {
+			m = append(m, []rune(l))
+		}
+
+		if result := d04p2(m); result != tt.expected {
+			t.Error("expected", tt.expected, "result", result)
 		}
 	}
 }
