@@ -34,7 +34,7 @@ func TestD02P2(t *testing.T) {
 }
 
 func TestD03P1(t *testing.T) {
-	f, err := os.ReadFile("d03")
+	f, err := os.ReadFile("inputs/d03")
 	if err != nil {
 		panic(err)
 	}
@@ -57,7 +57,7 @@ func TestD03P1(t *testing.T) {
 }
 
 func TestD03P2(t *testing.T) {
-	f, err := os.ReadFile("d03")
+	f, err := os.ReadFile("inputs/d03")
 	if err != nil {
 		panic(err)
 	}

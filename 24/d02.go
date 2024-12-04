@@ -9,7 +9,7 @@ import (
 )
 
 func d02p1() int {
-	file, err := os.Open("d02")
+	file, err := os.Open("inputs/d02")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return -1
@@ -65,7 +65,7 @@ func abs(i int) int {
 }
 
 func d02p2() int {
-	file, err := os.Open("d02")
+	file, err := os.Open("inputs/d02")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return -1

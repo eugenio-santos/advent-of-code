@@ -10,7 +10,7 @@ import (
 )
 
 func d01p1() int {
-	file, err := os.Open("d01")
+	file, err := os.Open("inputs/d01")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return -1
@@ -61,7 +61,7 @@ func absDiff(x int, y int) int {
 }
 
 func d01p2() int {
-	file, err := os.Open("d01")
+	file, err := os.Open("inputs/d01")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return -1
