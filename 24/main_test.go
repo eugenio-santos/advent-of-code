@@ -122,3 +122,35 @@ func TestD04P2(t *testing.T) {
 		}
 	}
 }
+
+func TestD05P1(t *testing.T) {
+	tests := []struct {
+		id       string
+		file     string
+		expected int
+	}{
+		{"example", "inputs/d05t", 143},
+		{"p1", "inputs/d05", 4135},
+	}
+	for _, tt := range tests {
+		if result, _, _ := d05p1(tt.file); result != tt.expected {
+			t.Error("expected", tt.expected, "result", result)
+		}
+	}
+}
+
+func TestD05P2(t *testing.T) {
+	tests := []struct {
+		id       string
+		file     string
+		expected int
+	}{
+		{"example", "inputs/d05t", 123},
+		{"p1", "inputs/d05", 5285},
+	}
+	for _, tt := range tests {
+		if result := d05p2(tt.file); result != tt.expected {
+			t.Error("expected", tt.expected, "result", result)
+		}
+	}
+}
