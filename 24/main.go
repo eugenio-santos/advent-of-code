@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -30,4 +31,8 @@ func max(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func fs(i int) string {
+	return strconv.Itoa(i)
 }

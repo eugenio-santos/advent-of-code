@@ -154,3 +154,63 @@ func TestD05P2(t *testing.T) {
 		}
 	}
 }
+
+func TestD06P1(t *testing.T) {
+	tests := []struct {
+		id       string
+		file     string
+		expected int
+	}{
+		{"example", "inputs/d06t", 41},
+		// {"p1", "inputs/d06", 4973},
+	}
+	for _, tt := range tests {
+		if result := d06p1(tt.file); result != tt.expected {
+			t.Error("expected", tt.expected, "result", result)
+		}
+	}
+}
+
+func TestGetVec(t *testing.T) {
+	tests := []struct {
+		id       string
+		angle    int
+		expected [2]int
+	}{
+		{"E", 0, [2]int{0, 1}},
+		{"S", 90, [2]int{1, 0}},
+		{"W", 180, [2]int{0, -1}},
+		{"N", 270, [2]int{-1, 0}},
+		{"N", 630 % 360, [2]int{-1, 0}},
+	}
+	for _, tt := range tests {
+		if result := GetVec(tt.angle); result != tt.expected {
+			t.Error("expected", tt.expected, "result", result)
+		}
+	}
+}
+
+func TestD06P2(t *testing.T) {
+	tests := []struct {
+		id       string
+		file     string
+		expected int
+	}{
+		{"example", "inputs/d06t", 6},
+		// {"p2", "inputs/d06", 4973},
+	}
+	for _, tt := range tests {
+		if result := d06p2(tt.file); result != tt.expected {
+			t.Error("expected", tt.expected, "result", result)
+		}
+	}
+}
+
+func TestF(t *testing.T) {
+	a := [2]int{0, 1}
+	b := a
+	b[0] = 5
+
+	t.Log("a", a)
+	t.Log("b", b)
+}
