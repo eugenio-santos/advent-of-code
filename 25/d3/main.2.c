@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "../logger/logger.h"
 
-long long solve(char *line, ssize_t read) {
+long long buildInts(char *line, ssize_t read) {
     char res[13] = {'0','0','0','0','0','0','0','0','0','0','0','0','\0'};
     int cursor = 0;
     for (int i=0; i < 12; i++){
@@ -45,7 +45,7 @@ void read_file(const char *filename) {
     // getline returns -1 on failure to read a line (e.g., EOF)
     while ((read = getline(&line, &len,file_ptr)) != -1) {
         ldebug("Read: %zd, Ints: %s", read, line);
-        res += solve(line, read);
+        res += buildInts(line, read);
     }
 
     // 3. Close the file and free the buffer

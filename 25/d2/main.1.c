@@ -26,7 +26,7 @@ bool is_not_valid(long long num){
     return false;
 }
 
-unsigned long long solve(char *interval, ssize_t read) {
+unsigned long long buildInts(char *interval, ssize_t read) {
     unsigned long long sum = 0;
     int dash_index = 0;
     for (int i = 0; i < read; i++) {
@@ -78,7 +78,7 @@ void read_file(const char *filename) {
 
     // getline returns -1 on failure to read a line (e.g., EOF)
     while ((read = getdelim(&line, &len, ',',file_ptr)) != -1) {
-        res +=  solve(line, read);
+        res +=  buildInts(line, read);
     }
 
     // 3. Close the file and free the buffer
