@@ -3,7 +3,6 @@ package main
 import (
 	"container/heap"
 	"fmt"
-	"log/slog"
 	"os"
 	"strconv"
 	"strings"
@@ -13,34 +12,13 @@ var fn string
 var maxPair int
 
 func main() {
-	var lvl slog.Leveler
 	if os.Args[1] == "test" {
-		lvl = slog.LevelDebug
 		fn = "test"
-		maxPair = 10
+		maxPair = 20
 	} else {
-		lvl = slog.LevelWarn
 		fn = "input"
 		maxPair = 1000
 	}
-
-	opts := &slog.HandlerOptions{
-		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-			if a.Key == slog.MessageKey {
-				a.Key = "m"
-			}
-			if a.Key == slog.LevelKey {
-				return slog.Attr{}
-			}
-			if a.Key == slog.TimeKey {
-				return slog.Attr{}
-			}
-			return a
-		},
-		Level: lvl,
-	}
-	logger := slog.New(slog.NewTextHandler(os.Stdout, opts))
-	slog.SetDefault(logger)
 
 	pointss := lines(fn)
 	var points []Point
@@ -56,17 +34,21 @@ func main() {
 			// fmt.Println(j, points[j])
 			d := sqrtDist(pi, points[j])
 			dist := &Dist{i, j, d}
-			h.PushBounded(dist)
+			heap.Push(h, dist)
 		}
 	}
 
-	for i, e := range *h {
-		fmt.Println(i, e)
-	}
+	// for i, e := range *h {
+	// 	_ = i
+	// 	fmt.Println(e.d)
+	// }
 
 	circ := []map[string]struct{}{}
 
-	for _, pair := range *h {
+	var winPair Dist
+
+	for len(*h) > 0 {
+		pair := heap.Pop(h).(*Dist)
 		tomerge := []int{}
 
 		for i, c := range circ {
@@ -89,29 +71,36 @@ func main() {
 				circ = circ[:len(circ)-1]
 			}
 		}
-	}
 
-	fmt.Println(circ)
-
-	maxC := []int{0, 0, 0}
-
-	for _, c := range circ {
-		lc := len(c)
-		if lc > maxC[0] {
-			maxC[0] = lc
-			if lc > maxC[1] {
-				maxC[0] = maxC[1]
-				maxC[1] = lc
-				if lc > maxC[2] {
-					maxC[1] = maxC[2]
-					maxC[2] = lc
-				}
-			}
+		if len(circ) == 1 && len(circ[0]) == maxPair {
+			winPair = *pair
+			break
 		}
 	}
 
-	fmt.Println(maxC[0], maxC[1], maxC[2])
-	fmt.Println(maxC[0] * maxC[1] * maxC[2])
+	fmt.Println(circ)
+	fmt.Println(points[winPair.i], points[winPair.j])
+	fmt.Println(points[winPair.i].x * points[winPair.j].x)
+
+	// maxC := []int{0, 0, 0}
+
+	// for _, c := range circ {
+	// 	lc := len(c)
+	// 	if lc > maxC[0] {
+	// 		maxC[0] = lc
+	// 		if lc > maxC[1] {
+	// 			maxC[0] = maxC[1]
+	// 			maxC[1] = lc
+	// 			if lc > maxC[2] {
+	// 				maxC[1] = maxC[2]
+	// 				maxC[2] = lc
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	// fmt.Println(maxC[0], maxC[1], maxC[2])
+	// fmt.Println(maxC[0] * maxC[1] * maxC[2])
 }
 
 func InSet(pointss []string, set map[string]struct{}, dist Dist) bool {
@@ -148,7 +137,6 @@ func psToP(ps string) Point {
 }
 func lines(file string) []string {
 	f, err := os.ReadFile(file)
-	slog.Debug("lines")
 	if err != nil {
 		panic(err)
 	}
@@ -165,7 +153,7 @@ type Dist struct {
 type DistHeap []*Dist
 
 func (d DistHeap) Len() int           { return len(d) }
-func (d DistHeap) Less(i, j int) bool { return d[i].d > d[j].d }
+func (d DistHeap) Less(i, j int) bool { return d[i].d < d[j].d }
 func (d DistHeap) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 
 func (d *DistHeap) PushBounded(item *Dist) {
