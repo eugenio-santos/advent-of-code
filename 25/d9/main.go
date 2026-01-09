@@ -1,11 +1,14 @@
 package main
 
 import (
-	"container/heap"
+	"context"
 	"fmt"
 	"os"
+	"runtime"
+	"sort"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 var fn string
@@ -30,61 +33,119 @@ func main() {
 		vertices = append(vertices, tileToPoint(ti))
 	}
 
-	h := &RecHeap{}
-	heap.Init(h)
+	h := RecHeap{}
 
 	for i, ti := range vertices {
 		for j := i + 1; j < len(vertices); j++ {
 			tj := vertices[j]
-			rec := &Rec{ti, tj, calcA(ti, tj)}
-			heap.Push(h, rec)
+			rec := Rec{ti, tj, calcA(ti, tj)}
+
+			h = append(h, rec)
 		}
 	}
 
-	for i, e := range *h {
-		if i > 100 {
+	sort.Sort(RecHeap(h))
+
+	for i, e := range h {
+		if i > 5 {
 			break
 		}
 		fmt.Println(i, e)
 	}
 
-a:
-	for len(*h) > 0 {
-		rec := heap.Pop(h).(*Rec)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-		pa := rec.pa
-		pc := rec.pc
-		pb := Point{pa.x, pc.y}
-		pd := Point{pc.x, pa.y}
+	jobs := make(chan Rec)
 
-		// test if pb and pd are on polygon (pa, pc we know they are)
-		if isPointInPolygon(pb, vertices) && isPointInPolygon(pd, vertices) {
-			// test if all edges are onpolygon a->b, b->c, c->d, d->a
-			recVert := []Point{pa, pb, pc, pd}
-			j := len(recVert) - 1
-			for i, vi := range recVert {
-				vj := recVert[j]
+	var wg sync.WaitGroup
 
-				diffx := vi.x - vj.x
-				diffy := vi.y - vj.y
+	fmt.Println("cores:", runtime.NumCPU())
 
-				diffx, diffy = decreaseDiffs(diffx, diffy)
-
-				for diffx != 0 || diffy != 0 {
-					if !isPointInPolygon(Point{vi.x - diffx, vi.y - diffy}, vertices) {
-						goto a
+	for w := 1; w <= runtime.NumCPU(); w++ {
+		wg.Add(1)
+		go func(workerID int, vertices []Point) {
+			defer wg.Done()
+			for {
+				select {
+				case <-ctx.Done(): // Stop if context is cancelled
+					return
+				case rec, ok := <-jobs:
+					if !ok { // Channel closed
+						return
 					}
 
-					diffx, diffy = decreaseDiffs(diffx, diffy)
+					// Process and check condition
+					if isRecInPoly(rec, vertices) {
+						fmt.Println("res: ", rec)
+						cancel()
+						return
+					}
+				}
+			}
+		}(w, vertices)
+	}
+
+	// arri := -1
+	// for len(h) > 0 {
+	// 	arri++
+	// 	rec := h[arri]
+
+	// 	if isRecInPoly(rec, vertices) {
+	// 		fmt.Println("res: ", rec)
+	// 		break
+	// 	}
+	// }
+
+	go func() {
+		for _, v := range h {
+			select {
+			case <-ctx.Done(): // Stop feeding if match found
+				break
+			case jobs <- v:
+			}
+		}
+		close(jobs)
+	}()
+
+	wg.Wait()
+	fmt.Println("All workers finished.")
+}
+
+func isRecInPoly(rec Rec, vertices []Point) bool {
+	pa := rec.pa
+	pc := rec.pc
+	pb := Point{pa.x, pc.y}
+	pd := Point{pc.x, pa.y}
+
+	// test if pb and pd are on polygon (pa, pc we know they are)
+	if isPointInPolygon(pb, vertices) && isPointInPolygon(pd, vertices) {
+		// test if all edges are onpolygon a->b, b->c, c->d, d->a
+		recVert := []Point{pa, pb, pc, pd}
+		j := len(recVert) - 1
+		for i, vi := range recVert {
+			vj := recVert[j]
+
+			diffx := vi.x - vj.x
+			diffy := vi.y - vj.y
+
+			diffx, diffy = decreaseDiffs(diffx, diffy)
+
+			for diffx != 0 || diffy != 0 {
+				if !isPointInPolygon(Point{vi.x - diffx, vi.y - diffy}, vertices) {
+					return false
 				}
 
-				j = i
+				diffx, diffy = decreaseDiffs(diffx, diffy)
 			}
 
-			fmt.Println("res: ", rec)
-			break
+			j = i
 		}
+
+		return true
 	}
+
+	return false
 }
 
 func decreaseDiffs(x, y int) (int, int) {
@@ -169,20 +230,8 @@ type Rec struct {
 	area int
 }
 
-type RecHeap []*Rec
+type RecHeap []Rec
 
 func (r RecHeap) Len() int           { return len(r) }
 func (r RecHeap) Less(i, j int) bool { return r[i].area > r[j].area }
 func (r RecHeap) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
-
-func (r *RecHeap) Push(x any) {
-	*r = append(*r, x.(*Rec))
-}
-
-func (r *RecHeap) Pop() any {
-	old := *r
-	n := len(old)
-	x := old[n-1]
-	*r = old[0 : n-1]
-	return x
-}
